@@ -2,25 +2,7 @@
 
 ## Activities
 
-Recordid allows you to record what you did during your day by accepting a
-formatted description of you activity.
-
-### Formatting rules
-
-Times are represented using the 24-hour clock and all times require 4 digits
-without intervening characters.
-
-Dates are represented as YYYY-MM-DD
-
-Description: Any characters not prefixed or postfixed by special characters.
-Start time: 4 digits followed by a dash.
-Finish time: 4 digits preceded by a dash.
-Start date: ^YYYY-MM-DD
-End date: $YYYY-MM-DD
-Tags: preceded by #
-Companions: preceded by @
-Locations: preceded by +
-
+Recordid allows you to record what you did during your day.
 
 ## Development
 

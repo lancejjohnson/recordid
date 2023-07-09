@@ -18,6 +18,13 @@ defmodule RecordidWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    live "/activities", ActivityLive.Index, :index
+    live "/activities/new", ActivityLive.Index, :new
+    live "/activities/:id/edit", ActivityLive.Index, :edit
+
+    live "/activities/:id", ActivityLive.Show, :show
+    live "/activities/:id/show/edit", ActivityLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
