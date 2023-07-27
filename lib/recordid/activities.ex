@@ -22,6 +22,24 @@ defmodule Recordid.Activities do
   end
 
   @doc """
+  Returns a list of activities for a given date sorted by start time descending.
+  """
+  def list_activities_for_date(date) do
+    Activity
+    |> started_on(date)
+    |> most_recent_first()
+    |> Repo.all()
+  end
+
+  defp started_on(query, date) do
+    from a in query, where: a.date_started == ^date
+  end
+
+  defp most_recent_first(query) do
+    from a in query, order_by: [desc: a.date_started, desc: a.time_started]
+  end
+
+  @doc """
   Gets a single activity.
 
   Raises `Ecto.NoResultsError` if the Activity does not exist.
@@ -100,5 +118,9 @@ defmodule Recordid.Activities do
   """
   def change_activity(%Activity{} = activity, attrs \\ %{}) do
     Activity.changeset(activity, attrs)
+  end
+
+  def new_activity() do
+    %Activity{}
   end
 end

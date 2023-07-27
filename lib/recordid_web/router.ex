@@ -25,6 +25,12 @@ defmodule RecordidWeb.Router do
 
     live "/activities/:id", ActivityLive.Show, :show
     live "/activities/:id/show/edit", ActivityLive.Show, :edit
+
+    live "/today", TodayLive
+
+    live "/days/:date", DayActivityLive, :index
+    live "/days/:date/activities/new", DayActivityLive, :new
+    live "/days/:date/activities/:id/edit", DayActivityLive, :edit
   end
 
   # Other scopes may use custom stacks.

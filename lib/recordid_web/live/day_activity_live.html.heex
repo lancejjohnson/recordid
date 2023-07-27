@@ -1,0 +1,54 @@
+<div class="flex justify-between content-center mb-2">
+  <h1 class="font-bold text-2xl"><%= @date %></h1>
+</div>
+
+<div class="flex gap-2">
+  <.link patch={~p"/days/#{@date}/activities/new"}>
+    <button
+      id="new-activity"
+      class="phx-submit-loading:opacity-75 rounded-2xl border border-blue-500 px-4 py-1 text-xs text-blue-500 hover:bg-blue-500 hover:text-white"
+    >
+      <.icon name="hero-plus-circle-solid" class="w-4 h-4" /> New
+    </button>
+  </.link>
+  <.link phx-click="start_activity" id="start-activity" }>
+    <button class="phx-submit-loading:opacity-75 rounded-2xl border border-blue-500 px-4 py-1 text-xs text-blue-500 hover:bg-blue-500 hover:text-white">
+      <.icon name="hero-clock-solid" class="w-4 h-4" /> Start
+    </button>
+  </.link>
+</div>
+
+<div class="mt-8">
+  <ul id="activities" phx-update="stream">
+    <li :for={{id, activity} <- @streams.activities} id={id} class="hover:bg-blue-100/50">
+      <.link patch={~p"/days/#{@date}/activities/#{activity}/edit"} class="group">
+        <div class="flex space-x-4 mb-4">
+          <div class="flex flex-col grow-0 shrink-0 basis-1/4">
+            <.time_range started_at={activity.time_started} finished_at={activity.time_finished} />
+            <.time_duration activity={activity} />
+          </div>
+          <div class="grow basis-3/4">
+            <%= activity.description %>
+          </div>
+        </div>
+      </.link>
+    </li>
+  </ul>
+</div>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="activity-modal"
+  show
+  on_cancel={JS.patch(~p"/days/#{@date}")}
+>
+  <.live_component
+    module={RecordidWeb.ActivityLive.FormComponent}
+    id={@activity.id || :new}
+    title={@page_title}
+    action={@live_action}
+    activity={@activity}
+    date={@date}
+    patch={~p"/days/#{@date}"}
+  />
+</.modal>

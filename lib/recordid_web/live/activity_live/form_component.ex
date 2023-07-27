@@ -9,7 +9,6 @@ defmodule RecordidWeb.ActivityLive.FormComponent do
     <div>
       <.header>
         <%= @title %>
-        <:subtitle>Use this form to manage activity records in your database.</:subtitle>
       </.header>
 
       <.simple_form
@@ -19,12 +18,33 @@ defmodule RecordidWeb.ActivityLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:description]} />
-        <.input field={@form[:time_started]} type="time" />
-        <.input field={@form[:time_finished]} type="time" />
+        <div class="flex flex-wrap gap-1">
+          <div class="flex-grow">
+            <.label>Started</.label>
+            <.input field={@form[:time_started]} type="time" />
+          </div>
+          <div class="flex-grow">
+            <.label>Finished</.label>
+            <.input field={@form[:time_finished]} type="time" />
+          </div>
+          <div class="w-full">
+            <.label>Description</.label>
+            <.input field={@form[:description]} type="textarea" />
+          </div>
+        </div>
 
         <:actions>
           <.button phx-disable-with="Saving...">Save Activity</.button>
+          <div class="flex-grow">
+            <.link
+              phx-click={JS.push("delete", value: %{id: @activity.id})}
+              phx-target={@myself}
+              data-confirm="Are you sure?"
+              class="text-sm text-red-500 border border-red-500 px-3 py-2 rounded-lg group hover:bg-red-600 hover:text-white"
+            >
+              <.icon name="hero-trash" class="bg-red-500 group-hover:bg-white" /> Delete
+            </.link>
+          </div>
         </:actions>
       </.simple_form>
     </div>
@@ -71,6 +91,8 @@ defmodule RecordidWeb.ActivityLive.FormComponent do
   end
 
   defp save_activity(socket, :new, activity_params) do
+    activity_params = add_date(activity_params, socket.assigns)
+
     case Activities.create_activity(activity_params) do
       {:ok, activity} ->
         notify_parent({:saved, activity})
@@ -85,9 +107,47 @@ defmodule RecordidWeb.ActivityLive.FormComponent do
     end
   end
 
+  def handle_event("delete", params, socket) do
+    delete_activity(socket, params)
+  end
+
+  defp delete_activity(socket, %{"id" => id}) do
+    activity = Activities.get_activity!(id)
+
+    case Activities.delete_activity(activity) do
+      {:ok, activity} ->
+        notify_parent({:deleted_activity, activity})
+
+        socket =
+          socket
+          |> put_flash(:info, "Activity deleted")
+          |> push_patch(to: socket.assigns.patch)
+
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        notify_parent({:delete_activity_failed, changeset})
+
+        socket =
+          socket
+          |> put_flash(:info, "Activity could not be deleted")
+          |> push_patch(to: socket.assigns.patch)
+
+        {:noreply, socket}
+    end
+  end
+
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
+
+  defp add_date(params, assigns) do
+    date = Map.get(assigns, :date, Date.utc_today())
+
+    params
+    |> Map.put_new("date_started", date)
+    |> Map.put_new("date_finished", date)
+  end
 end
