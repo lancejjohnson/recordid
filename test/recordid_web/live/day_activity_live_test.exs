@@ -3,19 +3,38 @@ defmodule RecordidWeb.DayActivityLiveTest do
   import Phoenix.LiveViewTest
   import Recordid.ActivitiesFixtures, only: [activity_fixture: 1]
 
-  test "loads all the activities for a given day", %{conn: conn} do
+  setup :register_and_log_in_user
+
+  test "loads all the activities for a given day", %{conn: conn, user: user} do
     day = ~D[2023-07-17]
 
-    day_activities = create_activities_for_day(day, 2)
+    day_activities = create_activities_for_day(day, user, 2)
 
     other_activities =
       day
       |> Date.add(-1)
-      |> create_activities_for_day(3)
+      |> create_activities_for_day(user, 3)
 
     {:ok, _live_view, html} = live(conn, ~p"/days/#{Date.to_string(day)}")
 
     for activity <- day_activities do
+      assert html =~ activity.description
+    end
+
+    for activity <- other_activities do
+      refute html =~ activity.description
+    end
+  end
+
+  test" loads only the activities for the authenticated user", %{conn: conn, user: user} do
+    day = ~D[2023-03-15]
+    activities = create_activities_for_day(day, user, 2)
+    other_user = Recordid.AccountsFixtures.user_fixture(%{email: "other@example.com"})
+    other_activities = create_activities_for_day(day, other_user, 2)
+
+    {:ok, _live_view, html} = live(conn, ~p"/days/#{Date.to_string(day)}")
+
+    for activity <- activities do
       assert html =~ activity.description
     end
 
@@ -74,9 +93,10 @@ defmodule RecordidWeb.DayActivityLiveTest do
   end
 
   test "starting an activity", %{conn: conn} do
+    flunk("This fails because it relies on data provided by JavaScript")
     day = ~D[2023-03-15]
 
-    {:ok, live_view, html} = live(conn, ~p"/days/#{Date.to_string(day)}")
+    {:ok, live_view, _html} = live(conn, ~p"/days/#{Date.to_string(day)}")
 
     live_view
     |> element("#start-activity")
@@ -89,9 +109,10 @@ defmodule RecordidWeb.DayActivityLiveTest do
     assert html =~ ~r/[0-2]\d:[0-5]\d-/
   end
 
-  defp create_activities_for_day(day, count \\ 0) do
+  defp create_activities_for_day(day, user, count) do
     for n <- 0..count do
       activity_fixture(
+        user_id: user.id,
         description: "Test activity #{n} for day #{day}",
         time_started: ~T[00:01:00],
         time_finished: Time.add(~T[00:01:00], 25, :minute),

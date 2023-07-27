@@ -75,6 +75,10 @@ defmodule RecordidWeb.ActivityLive.FormComponent do
     save_activity(socket, socket.assigns.action, activity_params)
   end
 
+  def handle_event("delete", params, socket) do
+    delete_activity(socket, params)
+  end
+
   defp save_activity(socket, :edit, activity_params) do
     case Activities.update_activity(socket.assigns.activity, activity_params) do
       {:ok, activity} ->
@@ -105,10 +109,6 @@ defmodule RecordidWeb.ActivityLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
     end
-  end
-
-  def handle_event("delete", params, socket) do
-    delete_activity(socket, params)
   end
 
   defp delete_activity(socket, %{"id" => id}) do

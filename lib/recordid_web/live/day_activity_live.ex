@@ -64,30 +64,30 @@ defmodule RecordidWeb.DayActivityLive do
     end
   end
 
-  def handle_event("delete", %{"id" => activity_id} = params, socket) do
+  def handle_event("delete", %{"id" => activity_id} = _params, socket) do
     activity = Activities.get_activity!(activity_id)
 
     case Activities.delete_activity(activity) do
       {:ok, _activity} ->
         {:noreply, push_patch(socket, ~p"/days/#{socket.assigns.date}")}
 
-      {:error, changeset} ->
+      {:error, _changeset} ->
         {:noreply, push_patch(socket, ~p"/days/#{socket.assigns.date}")}
     end
   end
 
   @impl true
-  def handle_info({FormComponent, {:saved, activity}}, socket) do
+  def handle_info({FormComponent, {:saved, _activity}}, socket) do
     activities = list_activities(socket.assigns.date)
     {:noreply, stream(socket, :activities, activities, reset: true)}
   end
 
-  def handle_info({FormComponent, {:deleted_activity, activity}}, socket) do
+  def handle_info({FormComponent, {:deleted_activity, _activity}}, socket) do
     activities = list_activities(socket.assigns.date)
     {:noreply, stream(socket, :activities, activities, reset: true)}
   end
 
-  def handle_info({FormComponent, {:delete_activity_failed, activity}}, socket) do
+  def handle_info({FormComponent, {:delete_activity_failed, _activity}}, socket) do
     activities = list_activities(socket.assigns.date)
     {:noreply, stream(socket, :activities, activities, reset: true)}
   end

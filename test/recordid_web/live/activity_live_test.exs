@@ -12,6 +12,8 @@ defmodule RecordidWeb.ActivityLiveTest do
     %{activity: activity}
   end
 
+  setup :register_and_log_in_user
+
   describe "Creating an activity" do
     test "without any data", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, ~p"/activities")
