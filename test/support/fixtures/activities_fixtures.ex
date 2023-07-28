@@ -4,15 +4,16 @@ defmodule Recordid.ActivitiesFixtures do
   entities via the `Recordid.Activities` context.
   """
 
+  alias Recordid.Accounts.User
+  alias Recordid.AccountsFixtures
+
   @doc """
   Generate a activity.
   """
   def activity_fixture(attrs \\ %{}) do
     {:ok, activity} =
       attrs
-      |> Enum.into(%{
-
-      })
+      |> Enum.into(%{})
       |> Recordid.Activities.create_activity()
 
     activity
@@ -28,14 +29,21 @@ defmodule Recordid.ActivitiesFixtures do
     |> full_activity_finished()
   end
 
+  # TODO(lancejjohnson): Not really happy with this
   def full_activity_finished(date) do
+    full_activity_finished(date, AccountsFixtures.user_fixture())
+  end
+
+  def full_activity_finished(date, user = %User{}) do
     attrs = %{
+      user_id: user.id,
       date_started: date,
       date_finished: date,
       time_started: Time.utc_now(),
-      time_finished: Time.add(Time.utc_now(), 60*20),
+      time_finished: Time.add(Time.utc_now(), 60 * 20),
       description: "Test description #{Enum.random(0..10_000)}"
     }
+
     activity_fixture(attrs)
   end
 end

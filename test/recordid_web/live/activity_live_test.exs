@@ -7,8 +7,8 @@ defmodule RecordidWeb.ActivityLiveTest do
   @create_attrs %{}
   @update_attrs %{}
 
-  defp create_activity(_) do
-    activity = activity_fixture()
+  defp create_activity(context) do
+    activity = activity_fixture(%{user_id: context.user.id})
     %{activity: activity}
   end
 

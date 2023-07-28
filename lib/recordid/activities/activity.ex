@@ -2,6 +2,8 @@ defmodule Recordid.Activities.Activity do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Recordid.Accounts.User
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "activities" do
@@ -11,16 +13,18 @@ defmodule Recordid.Activities.Activity do
     field :date_finished, :date
     field :time_started, :time
     field :time_finished, :time
+    belongs_to :user, User
 
     timestamps()
   end
 
-  @permitted_attrs ~w(description raw_content date_started date_finished time_started time_finished)a
+  @permitted_attrs ~w(description raw_content date_started date_finished time_started time_finished user_id)a
 
   @doc false
   def changeset(activity, attrs) do
     activity
     |> cast(attrs, @permitted_attrs)
+    |> validate_required(:user_id)
     |> default_to_today(:date_started)
     |> default_to_today(:date_finished)
   end

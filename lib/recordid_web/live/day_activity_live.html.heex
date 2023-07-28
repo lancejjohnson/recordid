@@ -11,7 +11,7 @@
       <.icon name="hero-plus-circle-solid" class="w-4 h-4" /> New
     </button>
   </.link>
-  <.link phx-click="start_activity" id="start-activity" }>
+  <.link phx-click="start_activity" id="start-activity">
     <button class="phx-submit-loading:opacity-75 rounded-2xl border border-blue-500 px-4 py-1 text-xs text-blue-500 hover:bg-blue-500 hover:text-white">
       <.icon name="hero-clock-solid" class="w-4 h-4" /> Start
     </button>
@@ -48,6 +48,7 @@
     title={@page_title}
     action={@live_action}
     activity={@activity}
+    current_user={@current_user}
     date={@date}
     patch={~p"/days/#{@date}"}
   />
