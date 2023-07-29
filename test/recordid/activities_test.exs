@@ -1,5 +1,6 @@
 defmodule Recordid.ActivitiesTest do
   use Recordid.DataCase
+  import Recordid.ActivitiesFixtures
 
   alias Recordid.Activities
 
@@ -95,6 +96,31 @@ defmodule Recordid.ActivitiesTest do
     test "change_activity/1 returns a activity changeset", %{user: user} do
       activity = activity_fixture(%{user_id: user.id})
       assert %Ecto.Changeset{} = Activities.change_activity(activity)
+    end
+  end
+
+  test "list_days_with_activities/1 lists all days on which a user has activities", %{user: user} do
+    data =
+      for day <- [~D[2023-03-15], ~D[2022-12-25], ~D[2023-07-04]], into: %{} do
+        {day,
+         create_activities(
+           user,
+           %{
+             date_started: day,
+             date_finished: day,
+             time_started: ~T[00:00:01],
+             time_finished: Time.add(~T[00:00:01], 25, :minute),
+             description: "Test activity for user #{user.id} on day #{Date.to_string(day)}"
+           },
+           Enum.random(0..5)
+         )}
+      end
+
+    results = Activities.list_days_with_activities(user)
+
+    for result <- results do
+      assert result[:date] in Map.keys(data)
+      assert result[:activity_count] == Enum.count(data[result[:date]])
     end
   end
 end

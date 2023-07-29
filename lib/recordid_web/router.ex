@@ -78,6 +78,7 @@ defmodule RecordidWeb.Router do
       live "/activities/:id", ActivityLive.Show, :show
       live "/activities/:id/show/edit", ActivityLive.Show, :edit
 
+      live "/days", DayLive, :index
       live "/days/:date", DayActivityLive, :index
       live "/days/:date/activities/new", DayActivityLive, :new
       live "/days/:date/activities/:id/edit", DayActivityLive, :edit
