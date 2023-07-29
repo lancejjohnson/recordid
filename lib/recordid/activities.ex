@@ -6,6 +6,7 @@ defmodule Recordid.Activities do
   import Ecto.Query, warn: false
   alias Recordid.Repo
 
+  alias Recordid.Accounts.User
   alias Recordid.Activities.Activity
 
   @doc """
@@ -17,18 +18,25 @@ defmodule Recordid.Activities do
       [%Activity{}, ...]
 
   """
-  def list_activities do
-    Repo.all(Activity)
+  def list_activities(user = %User{}) do
+    Activity
+    |> for_user(user)
+    |> Repo.all()
   end
 
   @doc """
   Returns a list of activities for a given date sorted by start time descending.
   """
-  def list_activities_for_date(date) do
+  def list_activities_for_date(user, date) do
     Activity
+    |> for_user(user)
     |> started_on(date)
     |> most_recent_first()
     |> Repo.all()
+  end
+
+  defp for_user(query, %User{id: user_id} = _user) do
+    from a in query, where: a.user_id == ^user_id
   end
 
   defp started_on(query, date) do
@@ -39,21 +47,11 @@ defmodule Recordid.Activities do
     from a in query, order_by: [desc: a.date_started, desc: a.time_started]
   end
 
-  @doc """
-  Gets a single activity.
-
-  Raises `Ecto.NoResultsError` if the Activity does not exist.
-
-  ## Examples
-
-      iex> get_activity!(123)
-      %Activity{}
-
-      iex> get_activity!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_activity!(id), do: Repo.get!(Activity, id)
+  def get_activity!(user, id) do
+    Activity
+    |> for_user(user)
+    |> Repo.get!(id)
+  end
 
   @doc """
   Creates a activity.
@@ -122,5 +120,9 @@ defmodule Recordid.Activities do
 
   def new_activity() do
     %Activity{}
+  end
+
+  def new_activity(%User{} = user) do
+    %{new_activity() | user_id: user.id}
   end
 end

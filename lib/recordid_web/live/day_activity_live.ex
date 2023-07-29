@@ -12,28 +12,28 @@ defmodule RecordidWeb.DayActivityLive do
 
   @impl Phoenix.LiveView
   def handle_params(%{"date" => date} = unsigned_params, _uri, socket) do
+    %{current_user: current_user} = socket.assigns
+
     socket =
       socket
       |> assign(:date, date)
-      |> stream(:activities, list_activities(date))
+      |> stream(:activities, Activities.list_activities_for_date(current_user, date))
 
     {:noreply, apply_action(socket, socket.assigns.live_action, unsigned_params)}
   end
 
-  defp list_activities(date) do
-    Activities.list_activities_for_date(date)
-  end
-
   defp apply_action(socket, :new, _params) do
-    activity = Activities.new_activity()
+    %{current_user: current_user} = socket.assigns
+    activity = Activities.new_activity(current_user)
 
     socket
     |> assign(:page_title, "New activity")
     |> assign(:activity, activity)
   end
 
-  defp apply_action(socket, :edit, %{"id" => id} = _params) do
-    activity = Activities.get_activity!(id)
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    %{current_user: current_user} = socket.assigns
+    activity = Activities.get_activity!(current_user, id)
 
     socket
     |> assign(:page_title, "Edit activity")
@@ -48,13 +48,19 @@ defmodule RecordidWeb.DayActivityLive do
 
   @impl Phoenix.LiveView
   def handle_event("start_activity", %{"current_time" => time} = _unsigned_params, socket) do
-    attrs = %{"time_started" => time, "date_started" => socket.assigns.date}
+    %{current_user: current_user, date: date} = socket.assigns
+
+    attrs = %{
+      "time_started" => time,
+      "date_started" => date,
+      "user_id" => current_user.id
+    }
 
     case Activities.create_activity(attrs) do
       {:ok, _activity} ->
         {:noreply,
          socket
-         |> stream(:activities, list_activities(socket.assigns.date), reset: true)
+         |> stream(:activities, Activities.list_activities_for_date(current_user, date), reset: true)
          |> put_flash(:info, "Activity created successfully")}
 
       {:error, _cset} ->
@@ -64,31 +70,35 @@ defmodule RecordidWeb.DayActivityLive do
     end
   end
 
-  def handle_event("delete", %{"id" => activity_id} = params, socket) do
-    activity = Activities.get_activity!(activity_id)
+  def handle_event("delete", %{"id" => activity_id} = _params, socket) do
+    %{current_user: current_user} = socket.assigns
+    activity = Activities.get_activity!(current_user, activity_id)
 
     case Activities.delete_activity(activity) do
       {:ok, _activity} ->
         {:noreply, push_patch(socket, ~p"/days/#{socket.assigns.date}")}
 
-      {:error, changeset} ->
+      {:error, _changeset} ->
         {:noreply, push_patch(socket, ~p"/days/#{socket.assigns.date}")}
     end
   end
 
   @impl true
-  def handle_info({FormComponent, {:saved, activity}}, socket) do
-    activities = list_activities(socket.assigns.date)
+  def handle_info({FormComponent, {:saved, _activity}}, socket) do
+    %{current_user: current_user, date: date} = socket.assigns
+    activities = Activities.list_activities_for_date(current_user, date)
     {:noreply, stream(socket, :activities, activities, reset: true)}
   end
 
-  def handle_info({FormComponent, {:deleted_activity, activity}}, socket) do
-    activities = list_activities(socket.assigns.date)
+  def handle_info({FormComponent, {:deleted_activity, _activity}}, socket) do
+    %{current_user: current_user, date: date} = socket.assigns
+    activities = Activities.list_activities_for_date(current_user, date)
     {:noreply, stream(socket, :activities, activities, reset: true)}
   end
 
-  def handle_info({FormComponent, {:delete_activity_failed, activity}}, socket) do
-    activities = list_activities(socket.assigns.date)
+  def handle_info({FormComponent, {:delete_activity_failed, _activity}}, socket) do
+    %{current_user: current_user, date: date} = socket.assigns
+    activities = Activities.list_activities_for_date(current_user, date)
     {:noreply, stream(socket, :activities, activities, reset: true)}
   end
 end

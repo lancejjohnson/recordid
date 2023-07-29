@@ -32,12 +32,13 @@ defmodule RecordidWeb.ActivityLive.FormComponent do
             <.input field={@form[:description]} type="textarea" />
           </div>
         </div>
+        <.input field={@form[:user_id]} type="hidden" />
 
         <:actions>
           <.button phx-disable-with="Saving...">Save Activity</.button>
           <div class="flex-grow">
             <.link
-              phx-click={JS.push("delete", value: %{id: @activity.id})}
+              phx-click={JS.push("delete", value: %{id: @activity.id}) |> hide_modal("activity-modal")}
               phx-target={@myself}
               data-confirm="Are you sure?"
               class="text-sm text-red-500 border border-red-500 px-3 py-2 rounded-lg group hover:bg-red-600 hover:text-white"
@@ -75,6 +76,10 @@ defmodule RecordidWeb.ActivityLive.FormComponent do
     save_activity(socket, socket.assigns.action, activity_params)
   end
 
+  def handle_event("delete", params, socket) do
+    delete_activity(socket, params)
+  end
+
   defp save_activity(socket, :edit, activity_params) do
     case Activities.update_activity(socket.assigns.activity, activity_params) do
       {:ok, activity} ->
@@ -107,12 +112,9 @@ defmodule RecordidWeb.ActivityLive.FormComponent do
     end
   end
 
-  def handle_event("delete", params, socket) do
-    delete_activity(socket, params)
-  end
-
   defp delete_activity(socket, %{"id" => id}) do
-    activity = Activities.get_activity!(id)
+    %{current_user: current_user} = socket.assigns
+    activity = Activities.get_activity!(current_user, id)
 
     case Activities.delete_activity(activity) do
       {:ok, activity} ->
