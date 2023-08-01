@@ -24,6 +24,18 @@ defmodule Recordid.Activities do
     |> Repo.all()
   end
 
+  def list_days_with_activities(user = %User{}) do
+    query =
+      from(a in Activity,
+        where: not is_nil(a.date_started) and a.user_id == ^user.id,
+        select: %{date: a.date_started, activity_count: count(a.id)},
+        group_by: [a.date_started],
+        order_by: [desc: a.date_started]
+      )
+
+    Repo.all(query)
+  end
+
   @doc """
   Returns a list of activities for a given date sorted by start time descending.
   """

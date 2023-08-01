@@ -7,6 +7,16 @@ defmodule Recordid.ActivitiesFixtures do
   alias Recordid.Accounts.User
   alias Recordid.AccountsFixtures
 
+  def create_activities(user, attrs \\ %{}, count \\ 1)
+
+  def create_activities(user, attrs, count) do
+    attrs = Map.put_new(attrs, :user_id, user.id)
+
+    for _ <- 1..count do
+      activity_fixture(attrs)
+    end
+  end
+
   @doc """
   Generate a activity.
   """
