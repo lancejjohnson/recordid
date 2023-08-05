@@ -70,6 +70,7 @@ defmodule RecordidWeb.Router do
       on_mount: [{RecordidWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      live "/users/preferences", PreferencesLive, :edit
 
       live "/activities", ActivityLive.Index, :index
       live "/activities/new", ActivityLive.Index, :new
