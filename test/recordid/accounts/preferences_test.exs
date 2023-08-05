@@ -3,12 +3,12 @@ defmodule Recordid.Accounts.PreferencesTest do
 
   alias Recordid.Accounts.Preferences
 
-  @invalid_timezone "America/Europa"
+  @invalid_time_zone "America/Europa"
 
   test "timezone must be a valid timezone" do
-    changeset = Preferences.changeset(%Preferences{}, %{"timezone" => @invalid_timezone})
+    changeset = Preferences.changeset(%Preferences{}, %{"time_zone" => @invalid_time_zone})
 
     refute changeset.valid?
-    assert "invalid timezone" in errors_on(changeset).timezone
+    assert "invalid time zone" in errors_on(changeset).time_zone
   end
 end

@@ -4,7 +4,7 @@ defmodule Recordid.Repo.Migrations.CreateAccountPreferences do
   def change do
     create table(:account_preferences, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :timezone, :string
+      add :time_zone, :string
 
       timestamps()
     end
