@@ -18,14 +18,14 @@ defmodule Recordid.Accounts.Preferences do
     preferences
     |> cast(attrs, @cast)
     |> validate_required(@require)
-    |> validate_time_zone()
+    |> validate_change(:time_zone, &validate_time_zone/2)
   end
 
-  defp validate_time_zone(%{changes: %{time_zone: time_zone}} = cset) do
+  defp validate_time_zone(:time_zone, time_zone) do
     if Tzdata.zone_exists?(time_zone) do
-      cset
+      []
     else
-      add_error(cset, :time_zone, "invalid time zone")
+      [time_zone: "invalid"]
     end
   end
 end
