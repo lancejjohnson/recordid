@@ -14,6 +14,7 @@ defmodule RecordidWeb.UserSettingsLiveTest do
 
       assert html =~ "Change Email"
       assert html =~ "Change Password"
+      assert html =~ "Change Time Zone"
     end
 
     test "redirects if user is not logged in", %{conn: conn} do

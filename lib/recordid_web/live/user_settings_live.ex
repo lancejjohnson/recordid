@@ -69,6 +69,28 @@ defmodule RecordidWeb.UserSettingsLive do
           </:actions>
         </.simple_form>
       </div>
+      <div>
+        <.simple_form
+          for={@time_zone_form}
+          id="time_zone_form"
+          phx-submit="update_time_zone"
+          phx-change="validate_time_zone"
+        >
+          <.input field={@time_zone_form[:time_zone]} type="text" label="Time Zone" required />
+          <.input
+            field={@time_zone_form[:current_time_zone]}
+            name="current_time_zone"
+            id="current_time_zone"
+            type="text"
+            label="Current time zone"
+            value={@time_zone_form_current_time_zone}
+            required
+          />
+          <:actions>
+            <.button phx-disable-with="Changing...">Change Time Zone</.button>
+          </:actions>
+        </.simple_form>
+      </div>
     </div>
     """
   end
