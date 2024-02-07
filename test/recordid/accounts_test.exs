@@ -505,4 +505,10 @@ defmodule Recordid.AccountsTest do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end
+
+  describe "change_user_time_zone/2" do
+    test "returns a changeset" do
+      assert %Ecto.Changeset{} = changeset = Accounts.change_user_time_zone(%User{})
+    end
+  end
 end

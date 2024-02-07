@@ -160,4 +160,9 @@ defmodule Recordid.Accounts.User do
       add_error(changeset, :current_password, "is not valid")
     end
   end
+
+  def time_zone_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:time_zone])
+  end
 end

@@ -350,4 +350,8 @@ defmodule Recordid.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+  def change_user_time_zone(%User{} = user, attrs \\ %{}) do
+    User.time_zone_changeset(user, attrs)
+  end
 end
