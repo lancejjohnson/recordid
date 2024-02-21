@@ -508,7 +508,7 @@ defmodule Recordid.AccountsTest do
 
   describe "change_user_time_zone/2" do
     test "returns a changeset" do
-      assert %Ecto.Changeset{} = changeset = Accounts.change_user_time_zone(%User{})
+      assert %Ecto.Changeset{} = Accounts.change_user_time_zone(%User{})
     end
   end
 end

@@ -11,6 +11,7 @@ defmodule Recordid.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
+    field :time_zone, :string
     has_many :activities, Activity
 
     timestamps()
@@ -164,5 +165,14 @@ defmodule Recordid.Accounts.User do
   def time_zone_changeset(user, attrs) do
     user
     |> cast(attrs, [:time_zone])
+    |> validate_change(:time_zone, &time_zone_must_exist/2)
+  end
+
+  defp time_zone_must_exist(:time_zone, time_zone) do
+    if Tzdata.zone_exists?(time_zone) do
+      []
+    else
+      [time_zone: "does not exist"]
+    end
   end
 end
