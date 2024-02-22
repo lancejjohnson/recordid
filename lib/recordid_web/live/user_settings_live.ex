@@ -78,7 +78,8 @@ defmodule RecordidWeb.UserSettingsLive do
         >
           <.input
             field={@time_zone_form[:time_zone]}
-            type="text"
+            type="select"
+            options={@available_time_zones}
             label="Time Zone"
             required
           />
@@ -119,6 +120,7 @@ defmodule RecordidWeb.UserSettingsLive do
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:time_zone_form, to_form(time_zone_changeset))
+      |> assign(:available_time_zones, Tzdata.canonical_zone_list())
       |> assign(:trigger_submit, false)
 
     {:ok, socket}
