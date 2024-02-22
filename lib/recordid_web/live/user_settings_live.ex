@@ -76,14 +76,10 @@ defmodule RecordidWeb.UserSettingsLive do
           phx-submit="update_time_zone"
           phx-change="validate_time_zone"
         >
-          <.input field={@time_zone_form[:time_zone]} type="text" label="Time Zone" required />
           <.input
-            field={@time_zone_form[:current_time_zone]}
-            name="current_time_zone"
-            id="current_time_zone"
+            field={@time_zone_form[:time_zone]}
             type="text"
-            label="Current time zone"
-            value={@time_zone_form_current_time_zone}
+            label="Time Zone"
             required
           />
           <:actions>
@@ -119,6 +115,7 @@ defmodule RecordidWeb.UserSettingsLive do
       |> assign(:current_password, nil)
       |> assign(:email_form_current_password, nil)
       |> assign(:current_email, user.email)
+      # TODO(lancejjohnson): assign current time_zone ?
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:time_zone_form, to_form(time_zone_changeset))

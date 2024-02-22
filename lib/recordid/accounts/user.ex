@@ -42,9 +42,10 @@ defmodule Recordid.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :time_zone])
     |> validate_email(opts)
     |> validate_password(opts)
+    |> validate_change(:time_zone, &time_zone_must_exist/2)
   end
 
   defp validate_email(changeset, opts) do

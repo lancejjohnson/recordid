@@ -208,4 +208,35 @@ defmodule RecordidWeb.UserSettingsLiveTest do
       assert message == "You must log in to access this page."
     end
   end
+
+  describe "time zone" do
+    setup %{conn: conn} do
+      time_zone = random_valid_time_zone()
+      user = user_fixture(%{time_zone: time_zone})
+      %{conn: log_in_user(conn, user), user: user}
+    end
+
+    test "displays the user's current time zone preference", %{conn: conn, user: user} do
+      {:ok, _lv, html} = live(conn, ~p"/users/settings")
+
+      assert html =~ user.time_zone
+    end
+
+    test "updates the user's time zone", %{conn: conn, user: user} do
+      new_time_zone = random_valid_time_zone(exclude: [user.time_zone])
+
+      {:ok, lv, _html} = live(conn, ~p"/users/settings")
+
+      result =
+        lv
+        |> form("#time_zone_form", %{"user" => %{"time_zone" => new_time_zone}})
+        |> render_submit()
+
+      assert result =~ "Time zone updated"
+
+      user = Accounts.get_user_by_email(user.email)
+
+      assert user.time_zone == new_time_zone
+    end
+  end
 end

@@ -28,4 +28,12 @@ defmodule Recordid.AccountsFixtures do
     [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
     token
   end
+
+  def random_valid_time_zone(opts \\ []) do
+    time_zone = Tzdata.canonical_zone_list() |> Enum.random()
+
+    if time_zone in Keyword.get(opts, :exclude, []),
+      do: random_valid_time_zone(opts),
+      else: time_zone
+  end
 end
