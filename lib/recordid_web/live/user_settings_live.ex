@@ -209,7 +209,7 @@ defmodule RecordidWeb.UserSettingsLive do
           |> Accounts.change_user_time_zone(user_params)
           |> to_form()
 
-        socket = put_flash(socket, :info, "time zone updated")
+        socket = put_flash(socket, :info, "Time zone updated")
         socket = assign(socket, time_zone_form: time_zone_form)
         {:noreply, socket}
 

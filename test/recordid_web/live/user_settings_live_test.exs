@@ -232,7 +232,7 @@ defmodule RecordidWeb.UserSettingsLiveTest do
         |> form("#time_zone_form", %{"user" => %{"time_zone" => new_time_zone}})
         |> render_submit()
 
-      assert result =~ "time zone updated"
+      assert result =~ ~r/time zone updated/i
 
       user = Accounts.get_user_by_email(user.email)
 
