@@ -116,7 +116,6 @@ defmodule RecordidWeb.UserSettingsLive do
       |> assign(:current_password, nil)
       |> assign(:email_form_current_password, nil)
       |> assign(:current_email, user.email)
-      # TODO(lancejjohnson): assign current time_zone ?
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:time_zone_form, to_form(time_zone_changeset))
@@ -185,6 +184,37 @@ defmodule RecordidWeb.UserSettingsLive do
 
       {:error, changeset} ->
         {:noreply, assign(socket, password_form: to_form(changeset))}
+    end
+  end
+
+  def handle_event("validate_time_zone", params, socket) do
+    %{"user" => user_params} = params
+
+    time_zone_form =
+      socket.assigns.current_user
+      |> Accounts.change_user_time_zone(user_params)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, time_zone_form: time_zone_form)}
+  end
+
+  def handle_event("update_time_zone", params, socket) do
+    %{"user" => user_params} = params
+
+    case Accounts.update_user_time_zone(socket.assigns.current_user, user_params) do
+      {:ok, user} ->
+        time_zone_form =
+          user
+          |> Accounts.change_user_time_zone(user_params)
+          |> to_form()
+
+        socket = put_flash(socket, :info, "time zone updated")
+        socket = assign(socket, time_zone_form: time_zone_form)
+        {:noreply, socket}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, time_zone_form: to_form(changeset))}
     end
   end
 end

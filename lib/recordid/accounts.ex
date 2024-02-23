@@ -351,6 +351,12 @@ defmodule Recordid.Accounts do
     end
   end
 
+  def update_user_time_zone(%User{} = user, attrs \\ %{}) do
+    user
+    |> change_user_time_zone(attrs)
+    |> Repo.update()
+  end
+
   def change_user_time_zone(%User{} = user, attrs \\ %{}) do
     User.time_zone_changeset(user, attrs)
   end
