@@ -26,10 +26,12 @@ let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
-  params: { _csrf_token: csrfToken },
+  params: {
+    _csrf_token: csrfToken,
+    time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  },
   metadata: {
     click: (e, el) => {
-      debugger;
       const date = new Date();
       return {
         current_time: date.toLocaleTimeString([], {

@@ -6,10 +6,16 @@ defmodule RecordidWeb.DayActivityLive do
   alias RecordidWeb.ActivityLive.FormComponent
 
   @impl Phoenix.LiveView
-  def mount(_params, _session, socket) do
-    {:ok, socket}
+  def mount(_params, session, %{assigns: assigns} = socket) do
+    time_zone = get_time_zone(session, get_connect_params(socket), assigns[:current_user])
+    {:ok, assign(socket, :time_zone, time_zone)}
   end
 
+  defp get_time_zone(session, connect_params, %{time_zone: user_time_zone}) do
+    session[:time_zone] || connect_params["time_zone"] || user_time_zone
+  end
+
+  # The unsigned_params are the params from the router. "date" comes from the URL param.
   @impl Phoenix.LiveView
   def handle_params(%{"date" => date} = unsigned_params, _uri, socket) do
     %{current_user: current_user} = socket.assigns
