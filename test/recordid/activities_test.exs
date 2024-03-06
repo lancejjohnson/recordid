@@ -10,11 +10,22 @@ defmodule Recordid.ActivitiesTest do
   end
 
   describe "creating an activity" do
+
+    # Creating an activity:
+    # Data that is needed to create a complete activity:
+    # - description
+    # - date
+    # - time
+    # - time zone the user is in when creating the activity
+
+
+
     test "defaults to today when start date is not included", %{user: user} do
       {:ok, activity} = Activities.create_activity(%{user_id: user.id})
       assert activity.date_started == Date.utc_today()
     end
 
+    # TODO(lancejjohnson): is this really the behavior I want?
     test "defaults to today when finish date is not included", %{user: user} do
       {:ok, activity} = Activities.create_activity(%{user_id: user.id})
       assert activity.date_finished == Date.utc_today()

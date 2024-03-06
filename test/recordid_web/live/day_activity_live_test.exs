@@ -26,7 +26,7 @@ defmodule RecordidWeb.DayActivityLiveTest do
     end
   end
 
-  test " loads only the activities for the authenticated user", %{conn: conn, user: user} do
+  test "loads only the activities for the authenticated user", %{conn: conn, user: user} do
     day = ~D[2023-03-15]
     activities = create_activities_for_day(day, user, 2)
     other_user = Recordid.AccountsFixtures.user_fixture(%{email: "other@example.com"})
@@ -55,9 +55,7 @@ defmodule RecordidWeb.DayActivityLiveTest do
 
     assert_patch(live_view, ~p"/days/#{Date.to_string(day)}")
 
-    html =
-      live_view
-      |> render()
+    html = live_view |> render()
 
     assert html =~ "Activity created successfully"
     assert html =~ description
@@ -114,6 +112,7 @@ defmodule RecordidWeb.DayActivityLiveTest do
 
     assert html =~ "Activity deleted"
     assert_patch(live_view, ~p"/days/#{Date.to_string(day)}")
+
     assert_raise Ecto.NoResultsError, fn ->
       Recordid.Repo.get!(Recordid.Activities.Activity, activity.id)
     end

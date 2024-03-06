@@ -52,13 +52,15 @@ defmodule RecordidWeb.DayActivityLive do
     |> assign(:activity, nil)
   end
 
+  # current_time is coming from app.js
   @impl Phoenix.LiveView
   def handle_event("start_activity", %{"current_time" => time} = _unsigned_params, socket) do
-    %{current_user: current_user, date: date} = socket.assigns
+    %{current_user: current_user, date: date, time_zone: time_zone} = socket.assigns
 
     attrs = %{
-      "time_started" => time,
       "date_started" => date,
+      "time_started" => time,
+      "time_zone" => time_zone,
       "user_id" => current_user.id
     }
 
@@ -66,13 +68,15 @@ defmodule RecordidWeb.DayActivityLive do
       {:ok, _activity} ->
         {:noreply,
          socket
-         |> stream(:activities, Activities.list_activities_for_date(current_user, date), reset: true)
+         |> stream(
+           :activities,
+           Activities.list_activities_for_date(current_user, date),
+           reset: true
+         )
          |> put_flash(:info, "Activity created successfully")}
 
       {:error, _cset} ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Could not create activity")}
+        {:noreply, put_flash(socket, :error, "Could not create activity")}
     end
   end
 
