@@ -11,10 +11,12 @@ defmodule Recordid.Activities.ActivityTest do
   end
 
   test "user must exist" do
-    assert_raise Ecto.ConstraintError, fn ->
+    {:error, changeset} =
       %Activity{}
       |> Activity.changeset(%{user_id: Ecto.UUID.generate()})
       |> Repo.insert()
-    end
+
+    refute changeset.valid?
+    assert "does not exist" in errors_on(changeset).user_id
   end
 end
