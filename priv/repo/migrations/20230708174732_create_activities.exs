@@ -5,11 +5,8 @@ defmodule Recordid.Repo.Migrations.CreateActivities do
     create table(:activities, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :description, :text
-      add :raw_content, :text
-      add :date_started, :date
-      add :date_finished, :date
-      add :time_started, :time
-      add :time_finished, :time
+      add :started_at, :utc_datetime
+      add :finished_at, :utc_datetime
 
       timestamps()
     end
